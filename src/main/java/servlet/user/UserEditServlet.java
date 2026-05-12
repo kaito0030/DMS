@@ -33,7 +33,7 @@ public class UserEditServlet extends HttpServlet {
                 "../user/userEdit.jsp"
         );
 
-        request.getRequestDispatcher("/jsp/common/layout.jsp")
+        request.getRequestDispatcher("/WEB-INF/jsp/common/layout.jsp")
                .forward(request, response);
     }
 
@@ -86,7 +86,7 @@ public class UserEditServlet extends HttpServlet {
                     "../user/userEdit.jsp"
             );
 
-            request.getRequestDispatcher("/jsp/common/layout.jsp")
+            request.getRequestDispatcher("/WEB-INF/jsp/common/layout.jsp")
                    .forward(request, response);
             return;
         }
@@ -106,7 +106,7 @@ public class UserEditServlet extends HttpServlet {
                     "../user/userEdit.jsp"
             );
 
-            request.getRequestDispatcher("/jsp/common/layout.jsp")
+            request.getRequestDispatcher("/WEB-INF/jsp/common/layout.jsp")
                    .forward(request, response);
 
             return;
@@ -128,7 +128,7 @@ public class UserEditServlet extends HttpServlet {
                         "../user/userEdit.jsp"
                 );
 
-                request.getRequestDispatcher("/jsp/common/layout.jsp")
+                request.getRequestDispatcher("/WEB-INF/jsp/common/layout.jsp")
                        .forward(request, response);
                 return;
             }

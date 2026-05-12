@@ -45,7 +45,7 @@ public class UserListServlet extends HttpServlet {
                 "../user/userList.jsp"
         );
 
-        request.getRequestDispatcher("/jsp/common/layout.jsp")
+        request.getRequestDispatcher("/WEB-INF/jsp/common/layout.jsp")
                .forward(request, response);
     }
 }

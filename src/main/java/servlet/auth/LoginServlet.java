@@ -22,7 +22,7 @@ public class LoginServlet extends HttpServlet {
             HttpServletResponse response)
             throws ServletException, IOException {
 
-        request.getRequestDispatcher("/jsp/auth/login.jsp")
+        request.getRequestDispatcher("/WEB-INF/jsp/auth/login.jsp")
                .forward(request, response);
     }
 
@@ -48,7 +48,7 @@ public class LoginServlet extends HttpServlet {
 
             HttpSession session = request.getSession();
             session.setAttribute("loginUser", user);
-
+            session.setMaxInactiveInterval(10);
             response.sendRedirect(
                     request.getContextPath() + "/document-search"
             );
@@ -60,7 +60,7 @@ public class LoginServlet extends HttpServlet {
                     "ユーザ名またはパスワードが違います"
             );
 
-            request.getRequestDispatcher("/jsp/auth/login.jsp")
+            request.getRequestDispatcher("/WEB-INF/jsp/auth/login.jsp")
                    .forward(request, response);
         }
     }

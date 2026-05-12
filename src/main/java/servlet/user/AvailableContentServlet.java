@@ -40,7 +40,7 @@ public class AvailableContentServlet extends HttpServlet {
                 "../user/availableContent.jsp"
         );
 
-        request.getRequestDispatcher("/jsp/common/layout.jsp")
+        request.getRequestDispatcher("/WEB-INF/jsp/common/layout.jsp")
                .forward(request, response);
     }
 }

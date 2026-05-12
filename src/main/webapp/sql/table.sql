@@ -68,3 +68,4 @@ CREATE TABLE document_permissions (
 );
 ALTER TABLE users
 ALTER COLUMN password TYPE VARCHAR(64);
+drop table view_histories;

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.UUID;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
@@ -18,6 +19,7 @@ import dao.PermissionDAO;
 import dao.UserDAO;
 import dto.DocumentDTO;
 import dto.UserDTO;
+import util.FileUtil;
 
 @WebServlet("/document-register")
 @MultipartConfig
@@ -29,9 +31,12 @@ public class DocumentRegisterServlet extends HttpServlet {
             HttpServletResponse response)
             throws ServletException, IOException {
 
-        request.setAttribute("contentPage", "../document/documentRegister.jsp");
+        request.setAttribute(
+                "contentPage",
+                "../document/documentRegister.jsp"
+        );
 
-        request.getRequestDispatcher("/jsp/common/layout.jsp")
+        request.getRequestDispatcher("/WEB-INF/jsp/common/layout.jsp")
                .forward(request, response);
     }
 
@@ -61,43 +66,82 @@ public class DocumentRegisterServlet extends HttpServlet {
             request.setAttribute("publishYear", publishYearStr);
             request.setAttribute("abstractText", abstractText);
 
-            request.setAttribute("contentPage", "../document/documentRegister.jsp");
+            request.setAttribute(
+                    "contentPage",
+                    "../document/documentRegister.jsp"
+            );
 
-            request.getRequestDispatcher("/jsp/common/layout.jsp")
+            request.getRequestDispatcher("/WEB-INF/jsp/common/layout.jsp")
+                   .forward(request, response);
+            return;
+        }
+
+        Part pdfPart = request.getPart("pdfFile");
+
+        if (pdfPart == null || pdfPart.getSize() == 0) {
+
+            request.setAttribute("fileError", "PDFファイルを選択してください");
+
+            request.setAttribute("documentId", documentId);
+            request.setAttribute("title", title);
+            request.setAttribute("author", author);
+            request.setAttribute("publishYear", publishYearStr);
+            request.setAttribute("abstractText", abstractText);
+
+            request.setAttribute(
+                    "contentPage",
+                    "../document/documentRegister.jsp"
+            );
+
+            request.getRequestDispatcher("/WEB-INF/jsp/common/layout.jsp")
+                   .forward(request, response);
+            return;
+        }
+
+        String originalFileName =
+                Paths.get(pdfPart.getSubmittedFileName())
+                     .getFileName()
+                     .toString();
+
+        String contentType = pdfPart.getContentType();
+
+        if (!originalFileName.toLowerCase().endsWith(".pdf")
+                || !"application/pdf".equals(contentType)) {
+
+            request.setAttribute("fileError", "PDFファイルのみアップロード可能です");
+
+            request.setAttribute("documentId", documentId);
+            request.setAttribute("title", title);
+            request.setAttribute("author", author);
+            request.setAttribute("publishYear", publishYearStr);
+            request.setAttribute("abstractText", abstractText);
+
+            request.setAttribute(
+                    "contentPage",
+                    "../document/documentRegister.jsp"
+            );
+
+            request.getRequestDispatcher("/WEB-INF/jsp/common/layout.jsp")
                    .forward(request, response);
             return;
         }
 
         int publishYear = Integer.parseInt(publishYearStr);
 
-        Part pdfPart = request.getPart("pdfFile");
+        File uploadDir = new File(FileUtil.PDF_DIRECTORY);
 
-        String pdfPath = "";
-
-        if (pdfPart != null && pdfPart.getSize() > 0) {
-
-            String originalFileName =
-                    Paths.get(pdfPart.getSubmittedFileName())
-                         .getFileName()
-                         .toString();
-
-            String saveFileName = documentId + "_" + originalFileName;
-
-            String uploadDirPath =
-                    getServletContext().getRealPath("/pdf");
-
-            File uploadDir = new File(uploadDirPath);
-
-            if (!uploadDir.exists()) {
-                uploadDir.mkdirs();
-            }
-
-            String savePath = uploadDirPath + File.separator + saveFileName;
-
-            pdfPart.write(savePath);
-
-            pdfPath = "pdf/" + saveFileName;
+        if (!uploadDir.exists()) {
+            uploadDir.mkdirs();
         }
+
+        String savedFileName = UUID.randomUUID().toString() + ".pdf";
+
+        String savePath =
+                FileUtil.PDF_DIRECTORY
+                        + File.separator
+                        + savedFileName;
+
+        pdfPart.write(savePath);
 
         DocumentDTO document = new DocumentDTO(
                 documentId,
@@ -105,11 +149,11 @@ public class DocumentRegisterServlet extends HttpServlet {
                 author,
                 publishYear,
                 abstractText,
-                pdfPath
+                savePath
         );
 
         documentDAO.insert(document);
-        
+
         UserDAO userDAO = new UserDAO();
         PermissionDAO permissionDAO = new PermissionDAO();
 

@@ -3,6 +3,7 @@ package servlet.document;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.UUID;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
@@ -14,6 +15,7 @@ import jakarta.servlet.http.Part;
 
 import dao.DocumentDAO;
 import dto.DocumentDTO;
+import util.FileUtil;
 
 @WebServlet("/document-edit")
 @MultipartConfig
@@ -33,9 +35,12 @@ public class DocumentEditServlet extends HttpServlet {
                 documentDAO.findByDocumentId(documentId);
 
         request.setAttribute("document", document);
-        request.setAttribute("contentPage", "../document/documentEdit.jsp");
+        request.setAttribute(
+                "contentPage",
+                "../document/documentEdit.jsp"
+        );
 
-        request.getRequestDispatcher("/jsp/common/layout.jsp")
+        request.getRequestDispatcher("/WEB-INF/jsp/common/layout.jsp")
                .forward(request, response);
     }
 
@@ -52,7 +57,12 @@ public class DocumentEditServlet extends HttpServlet {
 
         DocumentDAO documentDAO = new DocumentDAO();
 
+        DocumentDTO oldDocument =
+                documentDAO.findByDocumentId(documentId);
+
         if ("delete".equals(action)) {
+
+            deletePhysicalFile(oldDocument);
 
             documentDAO.delete(documentId);
 
@@ -61,9 +71,6 @@ public class DocumentEditServlet extends HttpServlet {
             );
             return;
         }
-
-        DocumentDTO oldDocument =
-                documentDAO.findByDocumentId(documentId);
 
         String title = request.getParameter("title");
         String author = request.getParameter("author");
@@ -82,22 +89,42 @@ public class DocumentEditServlet extends HttpServlet {
                          .getFileName()
                          .toString();
 
-            String saveFileName = documentId + "_" + originalFileName;
+            String contentType = pdfPart.getContentType();
 
-            String uploadDirPath =
-                    getServletContext().getRealPath("/pdf");
+            if (!originalFileName.toLowerCase().endsWith(".pdf")
+                    || !"application/pdf".equals(contentType)) {
 
-            File uploadDir = new File(uploadDirPath);
+                request.setAttribute("fileError", "PDFファイルのみアップロード可能です");
+                request.setAttribute("document", oldDocument);
+
+                request.setAttribute(
+                        "contentPage",
+                        "../document/documentEdit.jsp"
+                );
+
+                request.getRequestDispatcher("/WEB-INF/jsp/common/layout.jsp")
+                       .forward(request, response);
+                return;
+            }
+
+            deletePhysicalFile(oldDocument);
+
+            File uploadDir = new File(FileUtil.PDF_DIRECTORY);
 
             if (!uploadDir.exists()) {
                 uploadDir.mkdirs();
             }
 
-            String savePath = uploadDirPath + File.separator + saveFileName;
+            String savedFileName = UUID.randomUUID().toString() + ".pdf";
+
+            String savePath =
+                    FileUtil.PDF_DIRECTORY
+                            + File.separator
+                            + savedFileName;
 
             pdfPart.write(savePath);
 
-            pdfPath = "pdf/" + saveFileName;
+            pdfPath = savePath;
         }
 
         DocumentDTO document = new DocumentDTO(
@@ -114,5 +141,20 @@ public class DocumentEditServlet extends HttpServlet {
         response.sendRedirect(
                 request.getContextPath() + "/document-list"
         );
+    }
+
+    private void deletePhysicalFile(DocumentDTO document) {
+
+        if (document == null
+                || document.getPdfPath() == null
+                || document.getPdfPath().isEmpty()) {
+            return;
+        }
+
+        File file = new File(document.getPdfPath());
+
+        if (file.exists()) {
+            file.delete();
+        }
     }
 }

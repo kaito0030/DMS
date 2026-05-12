@@ -37,7 +37,7 @@ public class UserPermissionListServlet extends HttpServlet {
                 "../permission/userPermissionList.jsp"
         );
 
-        request.getRequestDispatcher("/jsp/common/layout.jsp")
+        request.getRequestDispatcher("/WEB-INF/jsp/common/layout.jsp")
                .forward(request, response);
     }
 }

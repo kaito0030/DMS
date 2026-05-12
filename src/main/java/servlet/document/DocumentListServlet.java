@@ -45,7 +45,7 @@ public class DocumentListServlet extends HttpServlet {
                 "../document/documentList.jsp"
         );
 
-        request.getRequestDispatcher("/jsp/common/layout.jsp")
+        request.getRequestDispatcher("/WEB-INF/jsp/common/layout.jsp")
                .forward(request, response);
     }
 }

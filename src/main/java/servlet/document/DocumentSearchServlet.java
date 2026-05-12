@@ -22,7 +22,7 @@ public class DocumentSearchServlet extends HttpServlet {
                 "../document/documentSearch.jsp"
         );
 
-        request.getRequestDispatcher("/jsp/common/layout.jsp")
+        request.getRequestDispatcher("/WEB-INF/jsp/common/layout.jsp")
                .forward(request, response);
     }
 }

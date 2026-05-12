@@ -10,9 +10,12 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import dao.DocumentDAO;
+import dao.PermissionDAO;
 import dto.DocumentDTO;
+import dto.UserDTO;
 
 @WebServlet("/document-pdf")
 public class DocumentPdfServlet extends HttpServlet {
@@ -26,6 +29,35 @@ public class DocumentPdfServlet extends HttpServlet {
         String documentId =
                 request.getParameter("documentId");
 
+        HttpSession session =
+                request.getSession(false);
+
+        if (session == null
+                || session.getAttribute("loginUser") == null) {
+
+            response.sendRedirect(
+                    request.getContextPath() + "/login"
+            );
+            return;
+        }
+
+        UserDTO loginUser =
+                (UserDTO) session.getAttribute("loginUser");
+
+        PermissionDAO permissionDAO =
+                new PermissionDAO();
+
+        boolean allowed =
+                permissionDAO.existsPermission(
+                        loginUser.getUserName(),
+                        documentId
+                );
+
+        if (!allowed && !loginUser.getAdmin()) {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN);
+            return;
+        }
+
         DocumentDAO documentDAO =
                 new DocumentDAO();
 
@@ -36,26 +68,15 @@ public class DocumentPdfServlet extends HttpServlet {
                 || document.getPdfPath() == null
                 || document.getPdfPath().isEmpty()) {
 
-            response.sendError(
-                    HttpServletResponse.SC_NOT_FOUND
-            );
-
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
 
-        String realPath =
-                getServletContext().getRealPath(
-                        "/" + document.getPdfPath()
-                );
-
-        File pdfFile = new File(realPath);
+        File pdfFile =
+                new File(document.getPdfPath());
 
         if (!pdfFile.exists()) {
-
-            response.sendError(
-                    HttpServletResponse.SC_NOT_FOUND
-            );
-
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
 
@@ -83,7 +104,6 @@ public class DocumentPdfServlet extends HttpServlet {
             int len;
 
             while ((len = in.read(buffer)) != -1) {
-
                 out.write(buffer, 0, len);
             }
         }

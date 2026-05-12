@@ -43,7 +43,7 @@ public class PermissionRegisterServlet extends HttpServlet {
                 "../permission/permissionRegister.jsp"
         );
 
-        request.getRequestDispatcher("/jsp/common/layout.jsp")
+        request.getRequestDispatcher("/WEB-INF/jsp/common/layout.jsp")
                .forward(request, response);
     }
 
