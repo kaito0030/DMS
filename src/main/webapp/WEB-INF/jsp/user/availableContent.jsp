@@ -38,5 +38,22 @@
 		</tbody>
 
 	</table>
-
+	
 </div>
+<div class="pagination-area">
+
+		<c:if test="${currentPage > 1}">
+			<a class="secondary-button"
+				href="${pageContext.request.contextPath}/available-content?page=${currentPage - 1}">
+				＜ </a>
+		</c:if>
+
+		<span class="page-info"> ${currentPage} / ${totalPages} </span>
+
+		<c:if test="${currentPage < totalPages}">
+			<a class="secondary-button"
+				href="${pageContext.request.contextPath}/available-content?page=${currentPage + 1}">
+				＞ </a>
+		</c:if>
+
+	</div>

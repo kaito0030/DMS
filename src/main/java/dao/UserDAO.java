@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import dto.PageResultDTO;
 import dto.UserDTO;
 import util.DBUtil;
 
@@ -106,76 +107,106 @@ public class UserDAO {
 
 		return null;
 	}
+	
+	public PageResultDTO<UserDTO> searchSortPaging(
+	        String searchColumn,
+	        String keyword,
+	        String sortColumn,
+	        String sortOrder,
+	        int limit,
+	        int offset) {
 
-	public List<UserDTO> search(String searchColumn, String keyword) {
+	    List<UserDTO> userList = new ArrayList<>();
+	    int totalCount = 0;
 
-		List<UserDTO> userList = new ArrayList<>();
+	    StringBuilder sql = new StringBuilder("""
+	            SELECT user_name, real_name, password, is_admin,
+	                   COUNT(*) OVER() AS total_count
+	            FROM users
+	            WHERE 1 = 1
+	            """);
+	    
+	    List<Object> params = new ArrayList<>();
 
-		String sql;
+	    if (searchColumn != null && keyword != null && !keyword.isBlank()) {
 
-		switch (searchColumn) {
+	        switch (searchColumn) {
 
-		case "userName":
-			sql = """
-					SELECT user_name, real_name, password, is_admin
-					FROM users
-					WHERE user_name LIKE ?
-					ORDER BY user_name
-					""";
-			keyword = "%" + keyword + "%";
-			break;
+	            case "userName":
+	                sql.append(" AND user_name LIKE ? ");
+	                params.add("%" + keyword + "%");
+	                break;
 
-		case "realName":
-			sql = """
-					SELECT user_name, real_name, password, is_admin
-					FROM users
-					WHERE real_name LIKE ?
-					ORDER BY user_name
-					""";
-			keyword = "%" + keyword + "%";
-			break;
+	            case "realName":
+	                sql.append(" AND real_name LIKE ? ");
+	                params.add("%" + keyword + "%");
+	                break;
 
-		case "userType":
-			sql = """
-					SELECT user_name, real_name, password, is_admin
-					FROM users
-					WHERE is_admin = ?
-					ORDER BY user_name
-					""";
-			break;
+	            case "userType":
+	                sql.append(" AND is_admin = ? ");
+	                params.add("admin".equals(keyword));
+	                break;
+	        }
+	    }
+	    
+	    String orderColumn = "user_name";
 
-		default:
-			return findAll();
-		}
+	    if ("realName".equals(sortColumn)) {
+	        orderColumn = "real_name";
+	    } else if ("userType".equals(sortColumn)) {
+	        orderColumn = "is_admin";
+	    }
 
-		try (
-				Connection con = DBUtil.getConnection();
-				PreparedStatement ps = con.prepareStatement(sql)) {
+	    String order = "ASC";
 
-			if ("userType".equals(searchColumn)) {
-				ps.setBoolean(1, "admin".equals(keyword));
-			} else {
-				ps.setString(1, keyword);
-			}
+	    if ("desc".equalsIgnoreCase(sortOrder)) {
+	        order = "DESC";
+	    }
 
-			try (ResultSet rs = ps.executeQuery()) {
+	    sql.append(" ORDER BY ")
+	       .append(orderColumn)
+	       .append(" ")
+	       .append(order)
+	       .append(" LIMIT ? OFFSET ? ");
 
-				while (rs.next()) {
-					userList.add(new UserDTO(
-							rs.getString("user_name"),
-							rs.getString("real_name"),
-							rs.getString("password"),
-							rs.getBoolean("is_admin")));
-				}
-			}
+	    try (
+	            Connection con = DBUtil.getConnection();
+	            PreparedStatement ps = con.prepareStatement(sql.toString())
+	    ) {
+	        int index = 1;
 
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+	        for (Object param : params) {
 
-		return userList;
+	            if (param instanceof Boolean) {
+	                ps.setBoolean(index++, (Boolean) param);
+	            } else {
+	                ps.setString(index++, param.toString());
+	            }
+	        }
+
+	        ps.setInt(index++, limit);
+	        ps.setInt(index, offset);
+
+	        try (ResultSet rs = ps.executeQuery()) {
+	            while (rs.next()) {
+	                userList.add(new UserDTO(
+	                        rs.getString("user_name"),
+	                        rs.getString("real_name"),
+	                        rs.getString("password"),
+	                        rs.getBoolean("is_admin")
+	                ));
+
+	                totalCount = rs.getInt("total_count");
+	            }
+	        }
+
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+
+	    return new PageResultDTO<>(userList, totalCount);
 	}
-
+	
 	public boolean insert(UserDTO user) {
 
 		String sql = """

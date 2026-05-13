@@ -10,10 +10,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import dao.UserDAO;
+import dto.PageResultDTO;
 import dto.UserDTO;
-
 @WebServlet("/user-list")
 public class UserListServlet extends HttpServlet {
+
+    private static final int LIMIT = 30;
 
     @Override
     protected void doGet(
@@ -25,20 +27,46 @@ public class UserListServlet extends HttpServlet {
 
         String searchColumn = request.getParameter("searchColumn");
         String keyword = request.getParameter("keyword");
+        String sortColumn = request.getParameter("sortColumn");
+        String sortOrder = request.getParameter("sortOrder");
+
+        int page = 1;
+
+        String pageParam = request.getParameter("page");
+
+        if (pageParam != null && !pageParam.isBlank()) {
+            page = Integer.parseInt(pageParam);
+        }
+
+        int offset = (page - 1) * LIMIT;
 
         UserDAO userDAO = new UserDAO();
 
-        List<UserDTO> userList;
+        PageResultDTO<UserDTO> result =
+                userDAO.searchSortPaging(
+                        searchColumn,
+                        keyword,
+                        sortColumn,
+                        sortOrder,
+                        LIMIT,
+                        offset
+                );
+        List<UserDTO> userList=result.getList();
+        int totalCount = result.getTotalCount();
 
-        if (searchColumn == null || keyword == null || keyword.isBlank()) {
-            userList = userDAO.findAll();
-        } else {
-            userList = userDAO.search(searchColumn, keyword);
+        int totalPages =
+                (int) Math.ceil((double) totalCount / LIMIT);
+        if (totalPages == 0) {
+            totalPages = 1;
         }
 
         request.setAttribute("userList", userList);
         request.setAttribute("searchColumn", searchColumn);
         request.setAttribute("keyword", keyword);
+        request.setAttribute("sortColumn", sortColumn);
+        request.setAttribute("sortOrder", sortOrder);
+        request.setAttribute("currentPage", page);
+        request.setAttribute("totalPages", totalPages);
 
         request.setAttribute(
                 "contentPage",

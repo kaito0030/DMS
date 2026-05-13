@@ -1,0 +1,68 @@
+@charset "UTF-8";
+/* =========================
+   ログイン画面
+========================= */
+
+.login-body {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+	height: 100vh;
+
+	background-color: rgb(240, 245, 250);
+}
+
+.login-box {
+	width: 350px;
+
+	padding: 40px;
+
+	background-color: white;
+
+	border-radius: 10px;
+
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.login-title {
+	text-align: center;
+
+	margin-bottom: 30px;
+}
+
+.input-group {
+	margin-bottom: 20px;
+}
+
+.input-group label {
+	display: block;
+
+	margin-bottom: 5px;
+}
+
+.input-group input {
+	width: 100%;
+
+	padding: 10px;
+
+	border: 1px solid #ccc;
+
+	border-radius: 5px;
+}
+
+.login-button {
+	width: 100%;
+
+	padding: 10px;
+
+	border: none;
+
+	background-color: rgb(25, 50, 75);
+
+	color: white;
+
+	border-radius: 5px;
+
+	cursor: pointer;
+}

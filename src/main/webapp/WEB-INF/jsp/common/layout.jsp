@@ -50,7 +50,7 @@
 
 				location.href = "${pageContext.request.contextPath}/login";
 
-			}, 10000);
+			}, 60000*30);
 		}
 
 		document.addEventListener("click", resetTimer);

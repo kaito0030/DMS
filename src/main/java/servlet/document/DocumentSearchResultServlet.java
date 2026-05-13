@@ -1,7 +1,6 @@
 package servlet.document;
 
 import java.io.IOException;
-import java.util.List;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -11,38 +10,55 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import dao.DocumentDAO;
 import dto.DocumentDTO;
+import dto.PageResultDTO;
 
 @WebServlet("/document-search-result")
 public class DocumentSearchResultServlet extends HttpServlet {
+	private static final int LIMIT = 30;
 
-    @Override
-    protected void doGet(
-            HttpServletRequest request,
-            HttpServletResponse response)
-            throws ServletException, IOException {
+	@Override
+	protected void doGet(
+			HttpServletRequest request,
+			HttpServletResponse response)
+			throws ServletException, IOException {
 
-        request.setCharacterEncoding("UTF-8");
+		request.setCharacterEncoding("UTF-8");
 
-        String keyword = request.getParameter("keyword");
+		String searchColumn = request.getParameter("searchColumn");
+		String keyword = request.getParameter("keyword");
 
-        DocumentDAO documentDAO = new DocumentDAO();
+		int page = 1;
 
-        List<DocumentDTO> documentList;
+		String pageParam = request.getParameter("page");
 
-        if (keyword == null || keyword.isBlank()) {
-            documentList = documentDAO.findAll();
-        } else {
-            documentList = documentDAO.search(keyword);
-        }
+		if (pageParam != null && !pageParam.isBlank()) {
+			page = Integer.parseInt(pageParam);
+		}
 
-        request.setAttribute("keyword", keyword);
-        request.setAttribute("documentList", documentList);
-        request.setAttribute(
-                "contentPage",
-                "../document/documentSearchResult.jsp"
-        );
+		int offset = (page - 1) * LIMIT;
 
-        request.getRequestDispatcher("/WEB-INF/jsp/common/layout.jsp")
-               .forward(request, response);
-    }
+		DocumentDAO documentDAO = new DocumentDAO();
+
+		PageResultDTO<DocumentDTO> result = documentDAO.searchPaging(
+				searchColumn,
+				keyword,
+				LIMIT,
+				offset);
+
+		int totalPages = (int) Math.ceil((double) result.getTotalCount() / LIMIT);
+
+		if (totalPages == 0) {
+			totalPages = 1;
+		}
+
+		request.setAttribute("documentList", result.getList());
+		request.setAttribute("searchColumn", searchColumn);
+		request.setAttribute("keyword", keyword);
+		request.setAttribute("currentPage", page);
+		request.setAttribute("totalPages", totalPages);
+		request.setAttribute("contentPage", "../document/documentSearchResult.jsp");
+
+		request.getRequestDispatcher("/WEB-INF/jsp/common/layout.jsp")
+				.forward(request, response);
+	}
 }

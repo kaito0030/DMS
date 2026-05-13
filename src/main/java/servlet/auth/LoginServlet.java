@@ -48,7 +48,7 @@ public class LoginServlet extends HttpServlet {
 
             HttpSession session = request.getSession();
             session.setAttribute("loginUser", user);
-            session.setMaxInactiveInterval(10);
+            session.setMaxInactiveInterval(60*30);
             response.sendRedirect(
                     request.getContextPath() + "/document-search"
             );

@@ -5,24 +5,29 @@
 
 <div class="form-card">
 
-    <form action="${pageContext.request.contextPath}/document-search-result"
-          method="get">
+<form action="${pageContext.request.contextPath}/document-search-result"
+      method="get"
+      class="list-search-form">
 
-        <div class="form-row">
-            <label>検索キーワード</label>
+    <select name="searchColumn"
+            class="search-select">
 
-            <input type="text"
-                   name="keyword"
-                   placeholder="文書タイトル・著者名を入力">
-        </div>
+        <option value="documentId">文書ID</option>
+        <option value="author">著者</option>
+        <option value="title">タイトル</option>
 
-        <div class="button-row">
-            <button type="submit"
-                    class="primary-button">
-                検索
-            </button>
-        </div>
+    </select>
 
-    </form>
+    <input type="text"
+           name="keyword"
+           class="search-input"
+           placeholder="検索文字列">
+
+    <button type="submit"
+            class="primary-button">
+        検索
+    </button>
+
+</form>
 
 </div>

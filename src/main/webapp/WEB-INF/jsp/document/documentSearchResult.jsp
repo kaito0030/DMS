@@ -36,8 +36,26 @@
 	</table>
 
 </div>
+<div class="bottom-area">
+	<div class="bottom-left">
+		<a href="${pageContext.request.contextPath}/document-search"
+			class="secondary-button"> 検索画面へ戻る </a>
+	</div>
+	<div class="bottom-center">
 
-<div class="page-button-area">
-	<a href="${pageContext.request.contextPath}/document-search"
-		class="secondary-button"> 検索画面へ戻る </a>
+		<c:if test="${currentPage > 1}">
+			<a class="secondary-button"
+				href="${pageContext.request.contextPath}/document-search-result?searchColumn=${searchColumn}&keyword=${keyword}&page=${currentPage - 1}">
+				＜ </a>
+		</c:if>
+
+		<span class="page-info"> ${currentPage} / ${totalPages} </span>
+
+		<c:if test="${currentPage < totalPages}">
+			<a class="secondary-button"
+				href="${pageContext.request.contextPath}/document-search-result?searchColumn=${searchColumn}&keyword=${keyword}&page=${currentPage + 1}">
+				＞ </a>
+		</c:if>
+
+	</div>
 </div>

@@ -1,0 +1,214 @@
+@charset "UTF-8";
+/* =========================
+   モーダル共通
+========================= */
+
+.modal-overlay {
+	position: fixed;
+
+	top: 0;
+	left: 0;
+
+	width: 100%;
+	height: 100%;
+
+	background-color: rgba(0, 0, 0, 0.25);
+
+	display: none;
+
+	justify-content: center;
+	align-items: center;
+
+	z-index: 9999;
+}
+
+.modal-overlay.active {
+	display: flex;
+}
+
+.modal-button-area {
+	margin-top: 18px;
+
+	display: flex;
+
+	justify-content: center;
+
+	gap: 10px;
+}
+
+/* =========================
+   選択ポップアップ
+========================= */
+
+.large-modal {
+	width: 700px;
+
+	max-width: 95%;
+
+	background-color: white;
+
+	border-radius: 12px;
+
+	padding: 25px;
+
+	box-shadow: 0 0 20px rgba(0, 0, 0, 0.25);
+}
+
+.large-modal h2 {
+	margin-bottom: 10px;
+
+	font-size: 24px;
+
+	color: rgb(25, 50, 75);
+}
+
+.popup-table {
+	height: 420px;
+
+	overflow-y: auto;
+
+	border: 1px solid #ccc;
+
+	margin-top: 15px;
+}
+
+.popup-table .data-table {
+	width: 100%;
+
+	border-collapse: collapse;
+
+	table-layout: fixed;
+}
+
+.popup-table .data-table th {
+	position: sticky;
+
+	top: 0;
+
+	background-color: rgb(25, 50, 75);
+
+	color: white;
+
+	z-index: 10;
+
+	font-size: 14px;
+
+	padding: 10px;
+}
+
+.popup-table .data-table td {
+	font-size: 13px;
+
+	padding: 8px 10px;
+
+	word-break: break-word;
+}
+
+.selectable-row {
+	cursor: pointer;
+
+	transition: background-color 0.15s;
+}
+
+.selectable-row:hover {
+	background-color: rgb(225, 225, 225);
+}
+/* =========================
+   確認ポップアップ
+========================= */
+
+.confirm-modal-box {
+	width: 380px;
+
+	background-color: white;
+
+	border-radius: 10px;
+
+	padding: 30px;
+
+	text-align: center;
+
+	box-shadow: 0 0 20px rgba(0, 0, 0, 0.25);
+}
+
+.confirm-modal-box h2 {
+	margin-top: 0;
+
+	color: rgb(25, 50, 75);
+}
+
+.confirm-modal-message {
+	margin: 20px 0;
+
+	font-size: 16px;
+}
+
+.confirm-modal-content {
+	text-align: left;
+
+	margin: 25px 0;
+
+	line-height: 2;
+}
+
+/* =========================
+   文書登録確認ポップアップ
+========================= */
+
+.document-confirm-modal-box {
+	width: 650px;
+
+	max-width: 90vw;
+
+	max-height: 85vh;
+
+	position: relative;
+
+	background: white;
+
+	color: #333;
+
+	border-radius: 12px;
+
+	padding: 30px;
+
+	display: flex;
+
+	flex-direction: column;
+
+	box-shadow: 0 0 20px rgba(0, 0, 0, 0.25);
+
+	z-index: 10000;
+}
+
+.document-confirm-content {
+	text-align: left;
+
+	margin: 20px 0;
+
+	overflow-y: auto;
+
+	max-height: 50vh;
+
+	line-height: 1.8;
+
+	padding-right: 10px;
+
+	background: white;
+}
+
+.confirm-abstract {
+	white-space: pre-wrap;
+
+	word-break: break-word;
+
+	display: block;
+
+	padding: 10px;
+
+	background-color: rgb(225, 225, 225);
+
+	border-radius: 5px;
+
+	margin-top: 5px;
+}

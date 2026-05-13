@@ -1,7 +1,6 @@
 package servlet.user;
 
 import java.io.IOException;
-import java.util.List;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -12,35 +11,51 @@ import jakarta.servlet.http.HttpSession;
 
 import dao.DocumentDAO;
 import dto.DocumentDTO;
+import dto.PageResultDTO;
 import dto.UserDTO;
 
 @WebServlet("/available-content")
 public class AvailableContentServlet extends HttpServlet {
+	private static final int LIMIT = 30;
 
-    @Override
-    protected void doGet(
-            HttpServletRequest request,
-            HttpServletResponse response)
-            throws ServletException, IOException {
+	@Override
+	protected void doGet(
+			HttpServletRequest request,
+			HttpServletResponse response)
+			throws ServletException, IOException {
 
-        HttpSession session = request.getSession(false);
-        UserDTO loginUser =
-                (UserDTO) session.getAttribute("loginUser");
+		int page = 1;
 
-        DocumentDAO documentDAO = new DocumentDAO();
+		String pageParam = request.getParameter("page");
 
-        List<DocumentDTO> documentList =
-                documentDAO.findAvailableByUserName(
-                        loginUser.getUserName()
-                );
+		if (pageParam != null && !pageParam.isBlank()) {
+			page = Integer.parseInt(pageParam);
+		}
 
-        request.setAttribute("documentList", documentList);
-        request.setAttribute(
-                "contentPage",
-                "../user/availableContent.jsp"
-        );
+		int offset = (page - 1) * LIMIT;
 
-        request.getRequestDispatcher("/WEB-INF/jsp/common/layout.jsp")
-               .forward(request, response);
-    }
+		HttpSession session = request.getSession(false);
+		UserDTO loginUser = (UserDTO) session.getAttribute("loginUser");
+
+		DocumentDAO documentDAO = new DocumentDAO();
+
+		PageResultDTO<DocumentDTO> result = documentDAO.findAvailableByUserNamePaging(
+				loginUser.getUserName(),
+				LIMIT,
+				offset);
+
+		int totalPages = (int) Math.ceil((double) result.getTotalCount() / LIMIT);
+
+		if (totalPages == 0) {
+			totalPages = 1;
+		}
+
+		request.setAttribute("documentList", result.getList());
+		request.setAttribute("currentPage", page);
+		request.setAttribute("totalPages", totalPages);
+		request.setAttribute("contentPage", "../user/availableContent.jsp");
+
+		request.getRequestDispatcher("/WEB-INF/jsp/common/layout.jsp")
+				.forward(request, response);
+	}
 }
