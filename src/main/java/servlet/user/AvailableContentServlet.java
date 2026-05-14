@@ -16,46 +16,62 @@ import dto.UserDTO;
 
 @WebServlet("/available-content")
 public class AvailableContentServlet extends HttpServlet {
-	private static final int LIMIT = 30;
 
-	@Override
-	protected void doGet(
-			HttpServletRequest request,
-			HttpServletResponse response)
-			throws ServletException, IOException {
+    private static final int LIMIT = 30;
 
-		int page = 1;
+    @Override
+    protected void doGet(
+            HttpServletRequest request,
+            HttpServletResponse response)
+            throws ServletException, IOException {
 
-		String pageParam = request.getParameter("page");
+        request.setCharacterEncoding("UTF-8");
 
-		if (pageParam != null && !pageParam.isBlank()) {
-			page = Integer.parseInt(pageParam);
-		}
+        HttpSession session = request.getSession(false);
+        UserDTO loginUser = (UserDTO) session.getAttribute("loginUser");
 
-		int offset = (page - 1) * LIMIT;
+        String targetUserName = request.getParameter("userName");
 
-		HttpSession session = request.getSession(false);
-		UserDTO loginUser = (UserDTO) session.getAttribute("loginUser");
+        if (targetUserName == null || targetUserName.isBlank()) {
+            targetUserName = loginUser.getUserName();
+        }
 
-		DocumentDAO documentDAO = new DocumentDAO();
+        int page = 1;
+        String pageParam = request.getParameter("page");
 
-		PageResultDTO<DocumentDTO> result = documentDAO.findAvailableByUserNamePaging(
-				loginUser.getUserName(),
-				LIMIT,
-				offset);
+        if (pageParam != null && !pageParam.isBlank()) {
+            page = Integer.parseInt(pageParam);
+        }
 
-		int totalPages = (int) Math.ceil((double) result.getTotalCount() / LIMIT);
+        int offset = (page - 1) * LIMIT;
 
-		if (totalPages == 0) {
-			totalPages = 1;
-		}
+        DocumentDAO documentDAO = new DocumentDAO();
 
-		request.setAttribute("documentList", result.getList());
-		request.setAttribute("currentPage", page);
-		request.setAttribute("totalPages", totalPages);
-		request.setAttribute("contentPage", "../user/availableContent.jsp");
+        PageResultDTO<DocumentDTO> result =
+                documentDAO.findAvailableByUserNamePaging(
+                        targetUserName,
+                        LIMIT,
+                        offset
+                );
 
-		request.getRequestDispatcher("/WEB-INF/jsp/common/layout.jsp")
-				.forward(request, response);
-	}
+        int totalPages =
+                (int) Math.ceil((double) result.getTotalCount() / LIMIT);
+
+        if (totalPages == 0) {
+            totalPages = 1;
+        }
+
+        request.setAttribute("documentList", result.getList());
+        request.setAttribute("targetUserName", targetUserName);
+        request.setAttribute("currentPage", page);
+        request.setAttribute("totalPages", totalPages);
+
+        request.setAttribute(
+                "contentPage",
+                "../user/availableContent.jsp"
+        );
+
+        request.getRequestDispatcher("/WEB-INF/jsp/common/layout.jsp")
+               .forward(request, response);
+    }
 }

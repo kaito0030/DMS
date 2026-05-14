@@ -119,7 +119,7 @@
                 </td>
 
                 <td>
-                    <a href="${pageContext.request.contextPath}/user-permission-list?userName=${user.userName}"
+                    <a href="${pageContext.request.contextPath}/available-content?userName=${user.userName}"
                        class="detail-button">
                         閲覧可能文書
                     </a>

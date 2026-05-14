@@ -1,7 +1,14 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core"%>
 
-<h1>閲覧可能コンテンツ一覧</h1>
+<c:choose>
+    <c:when test="${targetUserName == sessionScope.loginUser.userName}">
+        <h1>閲覧可能コンテンツ一覧</h1>
+    </c:when>
+    <c:otherwise>
+        <h1>${targetUserName} の閲覧可能コンテンツ一覧</h1>
+    </c:otherwise>
+</c:choose>
 
 <div class="table-container">
 
@@ -40,20 +47,25 @@
 	</table>
 	
 </div>
+
 <div class="pagination-area">
 
-		<c:if test="${currentPage > 1}">
-			<a class="secondary-button"
-				href="${pageContext.request.contextPath}/available-content?page=${currentPage - 1}">
-				＜ </a>
-		</c:if>
+    <c:if test="${currentPage > 1}">
+        <a class="secondary-button"
+           href="${pageContext.request.contextPath}/available-content?userName=${targetUserName}&page=${currentPage - 1}">
+            ＜
+        </a>
+    </c:if>
 
-		<span class="page-info"> ${currentPage} / ${totalPages} </span>
+    <span class="page-info">
+        ${currentPage} / ${totalPages}
+    </span>
 
-		<c:if test="${currentPage < totalPages}">
-			<a class="secondary-button"
-				href="${pageContext.request.contextPath}/available-content?page=${currentPage + 1}">
-				＞ </a>
-		</c:if>
+    <c:if test="${currentPage < totalPages}">
+        <a class="secondary-button"
+           href="${pageContext.request.contextPath}/available-content?userName=${targetUserName}&page=${currentPage + 1}">
+            ＞
+        </a>
+    </c:if>
 
-	</div>
+</div>

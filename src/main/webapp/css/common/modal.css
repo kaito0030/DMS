@@ -35,7 +35,23 @@
 
 	gap: 10px;
 }
+.modal-bottom-area {
+    display: flex;
 
+    justify-content: space-between;
+
+    align-items: center;
+
+    margin-top: 18px;
+}
+
+.modal-pagination-area {
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+}
 /* =========================
    選択ポップアップ
 ========================= */
@@ -63,13 +79,16 @@
 }
 
 .popup-table {
-	height: 420px;
+	height: 360px;
 
 	overflow-y: auto;
 
+
 	border: 1px solid #ccc;
 
-	margin-top: 15px;
+	border-radius: 5px;
+
+	background-color: white;
 }
 
 .popup-table .data-table {
@@ -112,6 +131,19 @@
 
 .selectable-row:hover {
 	background-color: rgb(225, 225, 225);
+	
+}
+
+.popup-search-area {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    margin: 15px;
+}
+
+.popup-search-area .search-input {
+    width: 260px;
 }
 /* =========================
    確認ポップアップ

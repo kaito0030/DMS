@@ -30,18 +30,26 @@
 	</div>
 
 
-	<div class="detail-button-row">
-		<a
-			href="${pageContext.request.contextPath}/document-pdf?documentId=${document.documentId}"
-			target="_blank" class="pdf-button"> PDF </a>
-
-		<c:if test="${sessionScope.loginUser.admin}">
-
+	<div class="bottom-area">
+		<div class="bottom-center">
 			<a
-				href="${pageContext.request.contextPath}/document-edit?documentId=${document.documentId}"
-				class="edit-button"> 編集 </a>
+				href="${pageContext.request.contextPath}/document-pdf?documentId=${document.documentId}"
+				target="_blank" class="pdf-button"> PDF </a>
 
-		</c:if>
+			<c:if test="${sessionScope.loginUser.admin}">
+
+				<a
+					href="${pageContext.request.contextPath}/document-edit?documentId=${document.documentId}"
+					class="edit-button"> 編集 </a>
+
+			</c:if>
+		</div>
+		<div class="bottom-left">
+
+			<a href="javascript:history.back()" class="secondary-button"> 戻る
+			</a>
+
+		</div>
 	</div>
 
 </div>
